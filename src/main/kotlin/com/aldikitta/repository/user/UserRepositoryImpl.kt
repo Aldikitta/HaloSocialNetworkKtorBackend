@@ -1,12 +1,12 @@
-package com.aldikitta.controller.user
+package com.aldikitta.repository.user
 
 import com.aldikitta.data.models.User
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 
-class UserControllerImpl(
+class UserRepositoryImpl(
     db: CoroutineDatabase
-): UserController {
+): UserRepository {
     private val users = db.getCollection<User>()
     override suspend fun createUser(user: User) {
         users.insertOne(user)

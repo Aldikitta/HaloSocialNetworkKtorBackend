@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
@@ -15,6 +17,12 @@ application {
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+}
+
+tasks.withType<KotlinCompile>().all {
+    kotlinOptions{
+        jvmTarget = "18"
+    }
 }
 
 repositories {
@@ -37,6 +45,10 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
+    testImplementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+
+
 
     //Koin-Injection
     implementation("io.insert-koin:koin-core:3.3.2")
@@ -47,4 +59,9 @@ dependencies {
     //Kmongo-Database
     implementation("org.litote.kmongo:kmongo:4.8.0")
     implementation("org.litote.kmongo:kmongo-coroutine:4.8.0")
+
+    //Testing
+    testImplementation("com.google.code.gson:gson:2.10.1")
+    testImplementation("com.google.truth:truth:1.1.3")
+    testImplementation("org.testng:testng:7.1.0")
 }

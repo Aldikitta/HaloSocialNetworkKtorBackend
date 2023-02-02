@@ -1,6 +1,6 @@
 package com.aldikitta.routes
 
-import com.aldikitta.controller.user.UserController
+import com.aldikitta.repository.user.UserRepository
 import com.aldikitta.data.models.User
 import com.aldikitta.data.requests.CreateAccountRequest
 import com.aldikitta.data.responses.BasicApiResponse
@@ -11,17 +11,17 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.koin.ktor.ext.inject
 
-fun Route.userRoutes() {
-    val userController: UserController by inject()
+fun Route.createUserRoute(
+    userRepository: UserRepository
+) {
     route("/api/user/create") {
         post {
             val request = call.receiveNullable<CreateAccountRequest>() ?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest)
                 return@post
             }
-            val userExists = userController.getUserByEmail(request.email) != null
+            val userExists = userRepository.getUserByEmail(request.email) != null
             if (userExists) {
                 call.respond(
                     BasicApiResponse(
@@ -40,7 +40,7 @@ fun Route.userRoutes() {
                 )
                 return@post
             }
-            userController.createUser(
+            userRepository.createUser(
                 user = User(
                     email = request.email,
                     username = request.username,

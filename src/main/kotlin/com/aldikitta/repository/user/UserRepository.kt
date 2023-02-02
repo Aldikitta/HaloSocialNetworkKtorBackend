@@ -1,8 +1,8 @@
-package com.aldikitta.controller.user
+package com.aldikitta.repository.user
 
 import com.aldikitta.data.models.User
 
-interface UserController {
+interface UserRepository {
     suspend fun createUser(user: User)
     suspend fun getUserById(id: String): User?
     suspend fun getUserByEmail(email: String): User?
