@@ -8,7 +8,6 @@ import com.aldikitta.repository.user.FakeUserRepository
 import com.aldikitta.util.ApiResponseMessages
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.Gson
-import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.gson.*
 import io.ktor.server.application.*

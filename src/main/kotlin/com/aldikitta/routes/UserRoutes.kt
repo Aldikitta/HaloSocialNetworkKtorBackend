@@ -1,10 +1,12 @@
 package com.aldikitta.routes
 
-import com.aldikitta.repository.user.UserRepository
+import com.aldikitta.data.repository.user.UserRepository
 import com.aldikitta.data.models.User
 import com.aldikitta.data.requests.CreateAccountRequest
+import com.aldikitta.data.requests.LoginRequest
 import com.aldikitta.data.responses.BasicApiResponse
 import com.aldikitta.util.ApiResponseMessages.FIELD_BLANK
+import com.aldikitta.util.ApiResponseMessages.INVALID_CREDENTIALS
 import com.aldikitta.util.ApiResponseMessages.USER_ALREADY_EXIST
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -57,6 +59,42 @@ fun Route.createUserRoute(
                     successful = true
                 )
             )
+        }
+    }
+}
+
+fun Route.loginUser(userRepository: UserRepository) {
+    route("/api/user/login") {
+        post {
+            val request = call.receiveNullable<LoginRequest>() ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest)
+                return@post
+            }
+            if (request.email.isBlank() || request.password.isBlank()) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@post
+            }
+
+            val isCorrectPassword = userRepository.doesPasswordForUserMatch(
+                email = request.email,
+                enteredPassword = request.password
+            )
+            if (isCorrectPassword) {
+                call.respond(
+                    HttpStatusCode.OK,
+                    BasicApiResponse(
+                        successful = true
+                    )
+                )
+            }else{
+                call.respond(
+                    HttpStatusCode.OK,
+                    BasicApiResponse(
+                        successful = false,
+                        message = INVALID_CREDENTIALS
+                    )
+                )
+            }
         }
     }
 }

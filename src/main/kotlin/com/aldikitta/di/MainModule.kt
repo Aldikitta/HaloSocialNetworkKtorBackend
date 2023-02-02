@@ -1,7 +1,7 @@
 package com.aldikitta.di
 
-import com.aldikitta.repository.user.UserRepository
-import com.aldikitta.repository.user.UserRepositoryImpl
+import com.aldikitta.data.repository.user.UserRepository
+import com.aldikitta.data.repository.user.UserRepositoryImpl
 import com.aldikitta.util.Constants
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.coroutine
