@@ -1,5 +1,7 @@
 package com.aldikitta.di
 
+import com.aldikitta.data.repository.follow.FollowRepository
+import com.aldikitta.data.repository.follow.FollowRepositoryImpl
 import com.aldikitta.data.repository.user.UserRepository
 import com.aldikitta.data.repository.user.UserRepositoryImpl
 import com.aldikitta.util.Constants
@@ -14,5 +16,8 @@ val mainModule = module {
     }
     single<UserRepository> {
         UserRepositoryImpl(get())
+    }
+    single<FollowRepository> {
+        FollowRepositoryImpl(get())
     }
 }
