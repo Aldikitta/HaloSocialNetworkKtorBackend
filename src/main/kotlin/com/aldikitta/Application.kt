@@ -1,6 +1,6 @@
 package com.aldikitta
 
-import com.aldikitta.data.di.mainModule
+import com.aldikitta.di.mainModule
 import io.ktor.server.application.*
 import com.aldikitta.plugins.*
 import org.koin.ktor.plugin.Koin
