@@ -1,8 +1,5 @@
 package com.aldikitta.plugins
 
-import com.aldikitta.data.repository.follow.FollowRepository
-import com.aldikitta.data.repository.post.PostRepository
-import com.aldikitta.data.repository.user.UserRepository
 import com.aldikitta.routes.*
 import com.aldikitta.service.FollowService
 import com.aldikitta.service.PostService
@@ -35,5 +32,7 @@ fun Application.configureRouting() {
 
         // Post routes
         createPostRoute(postService = postService, userService = userService)
+        getPostsForFollows(userService = userService, postService = postService)
+        deletePost(postService = postService, userService = userService)
     }
 }

@@ -44,4 +44,8 @@ class PostRepositoryImpl(
             .descendingSort(Post::timestamp)
             .toList()
     }
+
+    override suspend fun getPost(postId: String): Post? {
+        return posts.findOneById(postId)
+    }
 }
