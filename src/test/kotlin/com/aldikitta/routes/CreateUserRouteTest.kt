@@ -46,7 +46,7 @@ internal class CreateUserRouteTest : KoinTest {
         withTestApplication(
             moduleFunction = {
                 install(Routing) {
-                    createUserRoute(userRepository = userRepository)
+                    createUser(userRepository = userRepository)
                 }
                 install(ContentNegotiation) { gson { } }
             }
@@ -80,7 +80,7 @@ internal class CreateUserRouteTest : KoinTest {
         withTestApplication(
             moduleFunction = {
                 install(Routing) {
-                    createUserRoute(userRepository = userRepository)
+                    createUser(userRepository = userRepository)
                 }
                 install(ContentNegotiation) { gson { } }
             }
@@ -111,7 +111,7 @@ internal class CreateUserRouteTest : KoinTest {
           withTestApplication(
             moduleFunction = {
                 install(Routing) {
-                    createUserRoute(userRepository = userRepository)
+                    createUser(userRepository = userRepository)
                 }
                 install(ContentNegotiation) { gson { } }
             }
@@ -143,7 +143,7 @@ internal class CreateUserRouteTest : KoinTest {
         withTestApplication(
             moduleFunction = {
                 install(Routing) {
-                    createUserRoute(userRepository = userRepository)
+                    createUser(userRepository = userRepository)
                 }
                 install(ContentNegotiation) { gson { } }
             }

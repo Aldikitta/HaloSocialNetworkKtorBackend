@@ -1,7 +1,5 @@
 package com.aldikitta.routes
 
-import com.aldikitta.data.repository.user.UserRepository
-import com.aldikitta.data.models.User
 import com.aldikitta.data.requests.CreateAccountRequest
 import com.aldikitta.data.requests.LoginRequest
 import com.aldikitta.data.responses.AuthResponse
@@ -19,7 +17,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.util.*
 
-fun Route.createUserRoute(
+fun Route.createUser(
     userService: UserService
 ) {
     route("/api/user/create") {

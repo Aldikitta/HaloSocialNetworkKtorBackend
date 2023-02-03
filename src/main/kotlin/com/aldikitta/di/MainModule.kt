@@ -2,11 +2,14 @@ package com.aldikitta.di
 
 import com.aldikitta.data.repository.follow.FollowRepository
 import com.aldikitta.data.repository.follow.FollowRepositoryImpl
+import com.aldikitta.data.repository.likes.LikeRepository
+import com.aldikitta.data.repository.likes.LikeRepositoryImpl
 import com.aldikitta.data.repository.post.PostRepository
 import com.aldikitta.data.repository.post.PostRepositoryImpl
 import com.aldikitta.data.repository.user.UserRepository
 import com.aldikitta.data.repository.user.UserRepositoryImpl
 import com.aldikitta.service.FollowService
+import com.aldikitta.service.LikeService
 import com.aldikitta.service.PostService
 import com.aldikitta.service.UserService
 import com.aldikitta.util.Constants
@@ -28,7 +31,11 @@ val mainModule = module {
     single<PostRepository> {
         PostRepositoryImpl(get())
     }
+    single<LikeRepository> {
+        LikeRepositoryImpl(get())
+    }
     single { UserService(get()) }
     single { FollowService(get()) }
     single { PostService(get()) }
+    single { LikeService(get()) }
 }

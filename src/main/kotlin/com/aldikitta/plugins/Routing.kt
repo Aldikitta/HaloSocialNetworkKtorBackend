@@ -2,6 +2,7 @@ package com.aldikitta.plugins
 
 import com.aldikitta.routes.*
 import com.aldikitta.service.FollowService
+import com.aldikitta.service.LikeService
 import com.aldikitta.service.PostService
 import com.aldikitta.service.UserService
 import io.ktor.server.routing.*
@@ -12,13 +13,14 @@ fun Application.configureRouting() {
     val userService: UserService by inject()
     val followService: FollowService by inject()
     val postService: PostService by inject()
+    val likeService: LikeService by inject()
 
     val jwtIssuer = environment.config.property("jwt.domain").getString()
     val jwtAudience = environment.config.property("jwt.audience").getString()
     val jwtSecret = environment.config.property("jwt.secret").getString()
     routing {
         // User routes
-        createUserRoute(userService = userService)
+        createUser(userService = userService)
         loginUser(
             userService = userService,
             jwtIssuer = jwtIssuer,
@@ -31,8 +33,12 @@ fun Application.configureRouting() {
         unfollowUser(followService = followService)
 
         // Post routes
-        createPostRoute(postService = postService, userService = userService)
+        createPost(postService = postService, userService = userService)
         getPostsForFollows(userService = userService, postService = postService)
-        deletePost(postService = postService, userService = userService)
+        deletePost(postService = postService, userService = userService)]
+
+        // Like routes
+        likeParent(userService = userService, likeService = likeService)
+        unLikeParent(userService = userService, likeService = likeService)
     }
 }

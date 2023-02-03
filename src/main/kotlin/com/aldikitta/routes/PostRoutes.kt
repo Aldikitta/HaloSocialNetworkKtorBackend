@@ -3,7 +3,7 @@ package com.aldikitta.routes
 import com.aldikitta.data.requests.CreatePostRequest
 import com.aldikitta.data.requests.DeletePostRequest
 import com.aldikitta.data.responses.BasicApiResponse
-import com.aldikitta.plugins.email
+import com.aldikitta.service.LikeService
 import com.aldikitta.service.PostService
 import com.aldikitta.service.UserService
 import com.aldikitta.util.ApiResponseMessages.USER_NOT_FOUND
@@ -12,12 +12,11 @@ import com.aldikitta.util.QueryParams
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Route.createPostRoute(
+fun Route.createPost(
     postService: PostService,
     userService: UserService
 ) {
@@ -58,7 +57,7 @@ fun Route.createPostRoute(
 
 fun Route.getPostsForFollows(
     postService: PostService,
-    userService: UserService
+    userService: UserService,
 ) {
     authenticate {
         get {
@@ -86,7 +85,8 @@ fun Route.getPostsForFollows(
 
 fun Route.deletePost(
     postService: PostService,
-    userService: UserService
+    userService: UserService,
+    likeService: LikeService
 ) {
     route("/api/post/delete") {
         delete {
@@ -107,6 +107,9 @@ fun Route.deletePost(
                 validateEmail = userService::doesEmailBelongToUserId
             ) {
                 postService.deletePost(request.postId)
+                likeService.deleteLikesForParent(request.postId)
+
+                // TODO: Delete comments from post
                 call.respond(HttpStatusCode.OK)
             }
         }
