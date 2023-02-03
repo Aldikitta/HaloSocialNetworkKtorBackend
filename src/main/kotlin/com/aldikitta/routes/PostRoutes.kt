@@ -60,24 +60,26 @@ fun Route.getPostsForFollows(
     userService: UserService,
 ) {
     authenticate {
-        get {
-            val userId = call.parameters[QueryParams.PARAM_USER_ID] ?: kotlin.run {
-                call.respond(HttpStatusCode.BadRequest)
-                return@get
-            }
-            val page = call.parameters[QueryParams.PARAM_PAGE]?.toIntOrNull() ?: 0
-            val pageSize =
-                call.parameters[QueryParams.PARAM_PAGE_SIZE]?.toIntOrNull() ?: Constants.DEFAULT_POST_PAGE_SIZE
+        route("/api/post/get") {
+            get {
+                val userId = call.parameters[QueryParams.PARAM_USER_ID] ?: kotlin.run {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+                val page = call.parameters[QueryParams.PARAM_PAGE]?.toIntOrNull() ?: 0
+                val pageSize =
+                    call.parameters[QueryParams.PARAM_PAGE_SIZE]?.toIntOrNull() ?: Constants.DEFAULT_POST_PAGE_SIZE
 
-            ifEmailBelongsToUser(
-                userId = userId,
-                validateEmail = userService::doesEmailBelongToUserId
-            ) {
-                val posts = postService.getPostsForFollows(userId = userId, page = page, pageSize = pageSize)
-                call.respond(
-                    HttpStatusCode.OK,
-                    posts
-                )
+                ifEmailBelongsToUser(
+                    userId = userId,
+                    validateEmail = userService::doesEmailBelongToUserId
+                ) {
+                    val posts = postService.getPostsForFollows(userId = userId, page = page, pageSize = pageSize)
+                    call.respond(
+                        HttpStatusCode.OK,
+                        posts
+                    )
+                }
             }
         }
     }

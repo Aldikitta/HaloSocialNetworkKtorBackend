@@ -1,5 +1,7 @@
 package com.aldikitta.di
 
+import com.aldikitta.data.repository.comment.CommentRepository
+import com.aldikitta.data.repository.comment.CommentRepositoryImpl
 import com.aldikitta.data.repository.follow.FollowRepository
 import com.aldikitta.data.repository.follow.FollowRepositoryImpl
 import com.aldikitta.data.repository.likes.LikeRepository
@@ -8,10 +10,7 @@ import com.aldikitta.data.repository.post.PostRepository
 import com.aldikitta.data.repository.post.PostRepositoryImpl
 import com.aldikitta.data.repository.user.UserRepository
 import com.aldikitta.data.repository.user.UserRepositoryImpl
-import com.aldikitta.service.FollowService
-import com.aldikitta.service.LikeService
-import com.aldikitta.service.PostService
-import com.aldikitta.service.UserService
+import com.aldikitta.service.*
 import com.aldikitta.util.Constants
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.coroutine
@@ -34,8 +33,12 @@ val mainModule = module {
     single<LikeRepository> {
         LikeRepositoryImpl(get())
     }
+    single<CommentRepository> {
+        CommentRepositoryImpl(get())
+    }
     single { UserService(get()) }
     single { FollowService(get()) }
     single { PostService(get()) }
     single { LikeService(get()) }
+    single { CommentService(get()) }
 }
