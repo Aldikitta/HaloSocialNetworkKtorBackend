@@ -2,8 +2,13 @@ package com.aldikitta.di
 
 import com.aldikitta.data.repository.follow.FollowRepository
 import com.aldikitta.data.repository.follow.FollowRepositoryImpl
+import com.aldikitta.data.repository.post.PostRepository
+import com.aldikitta.data.repository.post.PostRepositoryImpl
 import com.aldikitta.data.repository.user.UserRepository
 import com.aldikitta.data.repository.user.UserRepositoryImpl
+import com.aldikitta.service.FollowService
+import com.aldikitta.service.PostService
+import com.aldikitta.service.UserService
 import com.aldikitta.util.Constants
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.coroutine
@@ -20,4 +25,10 @@ val mainModule = module {
     single<FollowRepository> {
         FollowRepositoryImpl(get())
     }
+    single<PostRepository> {
+        PostRepositoryImpl(get())
+    }
+    single { UserService(get()) }
+    single { FollowService(get()) }
+    single { PostService(get()) }
 }
