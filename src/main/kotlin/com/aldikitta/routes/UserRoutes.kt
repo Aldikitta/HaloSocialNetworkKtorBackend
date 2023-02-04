@@ -1,5 +1,6 @@
 package com.aldikitta.routes
 
+import com.aldikitta.data.models.User
 import com.aldikitta.data.requests.CreateAccountRequest
 import com.aldikitta.data.requests.LoginRequest
 import com.aldikitta.data.responses.AuthResponse
@@ -8,10 +9,12 @@ import com.aldikitta.service.UserService
 import com.aldikitta.util.ApiResponseMessages.FIELD_BLANK
 import com.aldikitta.util.ApiResponseMessages.INVALID_CREDENTIALS
 import com.aldikitta.util.ApiResponseMessages.USER_ALREADY_EXIST
+import com.aldikitta.util.QueryParams
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -110,6 +113,30 @@ fun Route.loginUser(
                         successful = false,
                         message = INVALID_CREDENTIALS
                     )
+                )
+            }
+        }
+    }
+}
+
+fun Route.searchUser(
+    userService: UserService
+) {
+    authenticate {
+        route("/api/user/search") {
+            get {
+                val query = call.parameters[QueryParams.PARAM_QUERY]
+                if (query.isNullOrBlank()) {
+                    call.respond(
+                        HttpStatusCode.OK,
+                        listOf<User>()
+                    )
+                    return@get
+                }
+                val searchResults = userService.searchForUsers(query, call.userId)
+                call.respond(
+                    HttpStatusCode.OK,
+                    searchResults
                 )
             }
         }
