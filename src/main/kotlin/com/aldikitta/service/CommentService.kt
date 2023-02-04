@@ -8,9 +8,9 @@ import com.aldikitta.util.Constants
 class CommentService(
     private val commentRepository: CommentRepository
 ) {
-    suspend fun createComment(createCommentRequest: CreateCommentRequest): ValidationEvents {
+    suspend fun createComment(createCommentRequest: CreateCommentRequest, userId: String): ValidationEvents {
         createCommentRequest.apply {
-            if (comment.isBlank() || userId.isBlank() || postId.isBlank()) {
+            if (comment.isBlank() || postId.isBlank()) {
                 return ValidationEvents.ErrorFieldEmpty
             }
             if (comment.length > Constants.MAX_COMMENT_LENGTH) {
@@ -20,7 +20,7 @@ class CommentService(
         commentRepository.createComment(
             Comment(
                 comment = createCommentRequest.comment,
-                userId = createCommentRequest.userId,
+                userId = userId,
                 postId = createCommentRequest.postId,
                 timestamp = System.currentTimeMillis()
             )
@@ -36,6 +36,9 @@ class CommentService(
         return commentRepository.getCommentsForPost(postId = postId)
     }
 
+    suspend fun getCommentById(commentId: String): Comment?{
+        return commentRepository.getComment(commentId = commentId)
+    }
     sealed class ValidationEvents {
         object ErrorFieldEmpty : ValidationEvents()
         object ErrorCommentToLong : ValidationEvents()

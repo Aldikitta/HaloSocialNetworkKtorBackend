@@ -28,5 +28,5 @@ fun Application.configureSecurity() {
     }
 }
 
-val JWTPrincipal.email: String?
-    get() = getClaim("email", String::class)
+val JWTPrincipal.userId: String?
+    get() = getClaim("userId", String::class)

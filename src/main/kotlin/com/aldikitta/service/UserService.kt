@@ -16,6 +16,14 @@ class UserService(
         return userRepository.doesEmailBelongToUserId(email = email, userId = userId)
     }
 
+    suspend fun getUserByEmail(email: String): User?{
+        return userRepository.getUserByEmail(email)
+    }
+
+    fun isValidPassword(enteredPassword: String, actualPassword: String): Boolean{
+        return enteredPassword == actualPassword
+    }
+
     suspend fun doesPasswordMatchForUser(request: LoginRequest): Boolean{
         return userRepository.doesPasswordForUserMatch(
             email = request.email,

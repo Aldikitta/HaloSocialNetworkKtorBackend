@@ -1,7 +1,6 @@
 package com.aldikitta.service
 
 import com.aldikitta.data.repository.likes.LikeRepository
-import java.io.StringReader
 
 class LikeService(
     private val likeRepository: LikeRepository

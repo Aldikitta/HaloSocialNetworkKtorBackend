@@ -3,7 +3,6 @@ package com.aldikitta.routes
 import com.aldikitta.data.requests.LikeUpdateRequest
 import com.aldikitta.data.responses.BasicApiResponse
 import com.aldikitta.service.LikeService
-import com.aldikitta.service.UserService
 import com.aldikitta.util.ApiResponseMessages.USER_NOT_FOUND
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -14,7 +13,6 @@ import io.ktor.server.routing.*
 
 fun Route.likeParent(
     likeService: LikeService,
-    userService: UserService
 ) {
     authenticate {
         route("/api/like") {
@@ -23,31 +21,25 @@ fun Route.likeParent(
                     call.respond(HttpStatusCode.BadRequest)
                     return@post
                 }
-
-                ifEmailBelongsToUser(
-                    userId = request.userId,
-                    validateEmail = userService::doesEmailBelongToUserId
-                ) {
-                    val likeSuccessful = likeService.likeParent(
-                        userId = request.userId,
-                        parentId = request.parentId
+                val likeSuccessful = likeService.likeParent(
+                    userId = call.userId,
+                    parentId = request.parentId
+                )
+                if (likeSuccessful) {
+                    call.respond(
+                        HttpStatusCode.OK,
+                        BasicApiResponse(
+                            successful = true,
+                        )
                     )
-                    if (likeSuccessful) {
-                        call.respond(
-                            HttpStatusCode.OK,
-                            BasicApiResponse(
-                                successful = true,
-                            )
+                } else {
+                    call.respond(
+                        HttpStatusCode.OK,
+                        BasicApiResponse(
+                            successful = false,
+                            message = USER_NOT_FOUND
                         )
-                    } else {
-                        call.respond(
-                            HttpStatusCode.OK,
-                            BasicApiResponse(
-                                successful = false,
-                                message = USER_NOT_FOUND
-                            )
-                        )
-                    }
+                    )
                 }
             }
         }
@@ -57,7 +49,6 @@ fun Route.likeParent(
 
 fun Route.unLikeParent(
     likeService: LikeService,
-    userService: UserService
 ) {
     authenticate {
         route("/api/unlike") {
@@ -66,31 +57,25 @@ fun Route.unLikeParent(
                     call.respond(HttpStatusCode.BadRequest)
                     return@delete
                 }
-
-                ifEmailBelongsToUser(
-                    userId = request.userId,
-                    validateEmail = userService::doesEmailBelongToUserId
-                ) {
-                    val unlikeSuccessful = likeService.unLikeParent(
-                        userId = request.userId,
-                        parentId = request.parentId
+                val unlikeSuccessful = likeService.unLikeParent(
+                    userId = call.userId,
+                    parentId = request.parentId
+                )
+                if (unlikeSuccessful) {
+                    call.respond(
+                        HttpStatusCode.OK,
+                        BasicApiResponse(
+                            successful = true,
+                        )
                     )
-                    if (unlikeSuccessful) {
-                        call.respond(
-                            HttpStatusCode.OK,
-                            BasicApiResponse(
-                                successful = true,
-                            )
+                } else {
+                    call.respond(
+                        HttpStatusCode.OK,
+                        BasicApiResponse(
+                            successful = false,
+                            message = USER_NOT_FOUND
                         )
-                    } else {
-                        call.respond(
-                            HttpStatusCode.OK,
-                            BasicApiResponse(
-                                successful = false,
-                                message = USER_NOT_FOUND
-                            )
-                        )
-                    }
+                    )
                 }
             }
         }
