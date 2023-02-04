@@ -2,6 +2,7 @@ package com.aldikitta.data.repository.likes
 
 import com.aldikitta.data.models.Like
 import com.aldikitta.data.models.User
+import com.aldikitta.data.util.ParentType
 import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
@@ -11,13 +12,14 @@ class LikeRepositoryImpl(
 ) : LikeRepository {
     private val like = db.getCollection<Like>()
     private val users = db.getCollection<User>()
-    override suspend fun likeParent(userId: String, parentId: String): Boolean {
+    override suspend fun likeParent(userId: String, parentId: String, parentType: Int): Boolean {
         val doesUserExist = users.findOneById(userId) != null
         return if (doesUserExist) {
             like.insertOne(
                 Like(
                     userId = userId,
-                    parentId = parentId
+                    parentId = parentId,
+                    parentType = parentType
                 )
             )
             true

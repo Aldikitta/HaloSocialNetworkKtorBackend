@@ -3,6 +3,7 @@ package com.aldikitta.routes
 import com.aldikitta.data.requests.CreateCommentRequest
 import com.aldikitta.data.requests.DeleteCommentRequest
 import com.aldikitta.data.responses.BasicApiResponse
+import com.aldikitta.service.ActivityService
 import com.aldikitta.service.CommentService
 import com.aldikitta.service.LikeService
 import com.aldikitta.util.ApiResponseMessages
@@ -16,7 +17,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Route.createComment(
-    commentService: CommentService
+    commentService: CommentService,
+    activityService: ActivityService
 ) {
     authenticate {
         route("/api/comment/create") {
@@ -25,7 +27,8 @@ fun Route.createComment(
                     call.respond(HttpStatusCode.BadRequest)
                     return@post
                 }
-                when (commentService.createComment(request, call.userId)) {
+                val userId = call.userId
+                when (commentService.createComment(request, userId)) {
                     is CommentService.ValidationEvents.ErrorCommentToLong -> {
                         call.respond(
                             HttpStatusCode.OK, BasicApiResponse(
@@ -45,6 +48,10 @@ fun Route.createComment(
                     }
 
                     is CommentService.ValidationEvents.Success -> {
+                        activityService.addCommentActivity(
+                            byUserId = userId,
+                            postId = request.postId,
+                        )
                         call.respond(
                             HttpStatusCode.OK, BasicApiResponse(
                                 successful = true,

@@ -12,13 +12,16 @@ fun Application.configureRouting() {
     val postService: PostService by inject()
     val likeService: LikeService by inject()
     val commentService: CommentService by inject()
+    val activityService: ActivityService by inject()
 
     val jwtIssuer = environment.config.property("jwt.domain").getString()
     val jwtAudience = environment.config.property("jwt.audience").getString()
     val jwtSecret = environment.config.property("jwt.secret").getString()
     routing {
         // User routes
-        createUser(userService = userService)
+        createUser(
+            userService = userService
+        )
         loginUser(
             userService = userService,
             jwtIssuer = jwtIssuer,
@@ -27,21 +30,53 @@ fun Application.configureRouting() {
         )
 
         // Following routes
-        followUser(followService = followService)
-        unfollowUser(followService = followService)
+        followUser(
+            followService = followService,
+            activityService = activityService
+        )
+        unfollowUser(
+            followService = followService
+        )
 
         // Post routes
-        createPost(postService = postService, userService = userService)
-        getPostsForFollows(postService = postService)
-        deletePost(postService = postService, likeService = likeService)
+        createPost(
+            postService = postService,
+            userService = userService
+        )
+        getPostsForFollows(
+            postService = postService
+        )
+        deletePost(
+            postService = postService,
+            likeService = likeService,
+            commentService = commentService
+        )
 
         // Like routes
-        likeParent(likeService = likeService)
-        unLikeParent(likeService = likeService)
+        likeParent(
+            likeService = likeService,
+            activityService = activityService
+        )
+        unLikeParent(
+            likeService = likeService
+        )
 
         // Comment routes
-        createComment(commentService = commentService)
-        deleteComment(commentService = commentService, likeService = likeService)
-        getCommentsForPost(commentService = commentService)
+        createComment(
+            commentService = commentService,
+            activityService = activityService
+        )
+        deleteComment(
+            commentService = commentService,
+            likeService = likeService
+        )
+        getCommentsForPost(
+            commentService = commentService
+        )
+
+        // Activity routes
+        getActivities(
+            activityService = activityService
+        )
     }
 }

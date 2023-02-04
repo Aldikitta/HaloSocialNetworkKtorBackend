@@ -2,6 +2,8 @@ package com.aldikitta.routes
 
 import com.aldikitta.data.requests.LikeUpdateRequest
 import com.aldikitta.data.responses.BasicApiResponse
+import com.aldikitta.data.util.ParentType
+import com.aldikitta.service.ActivityService
 import com.aldikitta.service.LikeService
 import com.aldikitta.util.ApiResponseMessages.USER_NOT_FOUND
 import io.ktor.http.*
@@ -13,6 +15,7 @@ import io.ktor.server.routing.*
 
 fun Route.likeParent(
     likeService: LikeService,
+    activityService: ActivityService
 ) {
     authenticate {
         route("/api/like") {
@@ -21,11 +24,18 @@ fun Route.likeParent(
                     call.respond(HttpStatusCode.BadRequest)
                     return@post
                 }
+                val userId = call.userId
                 val likeSuccessful = likeService.likeParent(
-                    userId = call.userId,
-                    parentId = request.parentId
+                    userId = userId,
+                    parentId = request.parentId,
+                    parentType = request.parentType
                 )
                 if (likeSuccessful) {
+                    activityService.addLikeActivity(
+                        byUserId = userId,
+                        parentType = ParentType.fromType(request.parentType),
+                        parentId = request.parentId
+                    )
                     call.respond(
                         HttpStatusCode.OK,
                         BasicApiResponse(

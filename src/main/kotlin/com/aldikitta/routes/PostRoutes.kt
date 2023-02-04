@@ -3,6 +3,7 @@ package com.aldikitta.routes
 import com.aldikitta.data.requests.CreatePostRequest
 import com.aldikitta.data.requests.DeletePostRequest
 import com.aldikitta.data.responses.BasicApiResponse
+import com.aldikitta.service.CommentService
 import com.aldikitta.service.LikeService
 import com.aldikitta.service.PostService
 import com.aldikitta.service.UserService
@@ -72,7 +73,8 @@ fun Route.getPostsForFollows(
 
 fun Route.deletePost(
     postService: PostService,
-    likeService: LikeService
+    likeService: LikeService,
+    commentService: CommentService
 ) {
     authenticate {
         route("/api/post/delete") {
@@ -92,8 +94,7 @@ fun Route.deletePost(
                 if (post.userId == call.userId) {
                     postService.deletePost(request.postId)
                     likeService.deleteLikesForParent(request.postId)
-
-                    // TODO: Delete comments from post
+                    commentService.deleteCommentsForPost(request.postId)
                     call.respond(HttpStatusCode.OK)
                 } else {
                     call.respond(

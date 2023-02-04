@@ -6,9 +6,9 @@ import org.bson.types.ObjectId
 data class Activity(
     @BsonId
     val id: String = ObjectId().toString(),
-    val timestamp: String,
+    val timestamp: Long,
     val byUserId: String,
-    val toUSerId: String,
+    val toUserId: String,
     val type: Int,
     val parentId: String
 )
