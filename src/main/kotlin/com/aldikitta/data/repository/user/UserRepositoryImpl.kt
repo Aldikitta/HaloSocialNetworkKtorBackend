@@ -1,6 +1,7 @@
 package com.aldikitta.data.repository.user
 
 import com.aldikitta.data.models.User
+import com.aldikitta.data.requests.UpdateProfileRequest
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 import org.litote.kmongo.or
@@ -38,5 +39,31 @@ class UserRepositoryImpl(
                 User::email eq query
             )
         ).toList()
+    }
+
+    override suspend fun updateUser(
+        userId: String,
+        profileImageUrl: String,
+        updateProfileRequest: UpdateProfileRequest
+    ): Boolean {
+        val user = getUserById(userId) ?: return false
+        return users.updateOneById(
+            id = userId,
+            update = User(
+                email = user.email,
+                username = updateProfileRequest.username,
+                password = user.password,
+                profileImageUrl = profileImageUrl,
+                bio = updateProfileRequest.bio,
+                githubUrl = updateProfileRequest.githubUrl,
+                instagramUrl = updateProfileRequest.instagramUrl,
+                linkedinUrl = updateProfileRequest.linkedInUrl,
+                skills = updateProfileRequest.skills,
+                followerCount = user.followerCount,
+                followingCount = user.followingCount,
+                postCount = user.postCount,
+                id = user.id
+            )
+        ).wasAcknowledged()
     }
 }

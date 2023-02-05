@@ -4,7 +4,9 @@ import com.aldikitta.routes.*
 import com.aldikitta.service.*
 import io.ktor.server.routing.*
 import io.ktor.server.application.*
+import io.ktor.server.http.content.*
 import org.koin.ktor.ext.inject
+import java.io.File
 
 fun Application.configureRouting() {
     val userService: UserService by inject()
@@ -18,6 +20,9 @@ fun Application.configureRouting() {
     val jwtAudience = environment.config.property("jwt.audience").getString()
     val jwtSecret = environment.config.property("jwt.secret").getString()
     routing {
+        static {
+            resources("static")
+        }
         // User routes
         createUser(
             userService = userService
@@ -29,6 +34,15 @@ fun Application.configureRouting() {
             jwtSecret = jwtSecret
         )
         searchUser(
+            userService = userService
+        )
+        getUserProfile(
+            userService = userService
+        )
+        getPostsForProfile(
+            postService = postService
+        )
+        updateUserProfile(
             userService = userService
         )
 

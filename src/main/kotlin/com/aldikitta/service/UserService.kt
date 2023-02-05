@@ -5,6 +5,8 @@ import com.aldikitta.data.repository.follow.FollowRepository
 import com.aldikitta.data.repository.user.UserRepository
 import com.aldikitta.data.requests.CreateAccountRequest
 import com.aldikitta.data.requests.LoginRequest
+import com.aldikitta.data.requests.UpdateProfileRequest
+import com.aldikitta.data.responses.ProfileResponse
 import com.aldikitta.data.responses.UserResponseItem
 
 class UserService(
@@ -15,8 +17,29 @@ class UserService(
         return userRepository.getUserByEmail(email = email) != null
     }
 
-    suspend fun doesEmailBelongToUserId(email: String, userId: String): Boolean {
-        return userRepository.doesEmailBelongToUserId(email = email, userId = userId)
+    suspend fun getUserProfile(userId: String, callerUserId: String): ProfileResponse? {
+        val user = userRepository.getUserById(userId) ?: return null
+        return ProfileResponse(
+            username = user.username,
+            bio = user.bio,
+            followerCount = user.followerCount,
+            followingCount = user.followingCount,
+            profilePictureUrl = user.profileImageUrl,
+            postCount = user.postCount,
+            topSkillUrls = user.skills,
+            githubUrl = user.githubUrl,
+            instagramUrl = user.instagramUrl,
+            linkedInUrl = user.linkedinUrl,
+            isOwnProfile = userId == callerUserId,
+            isFollowing = if (userId != callerUserId) {
+                followRepository.doesUserFollow(
+                    followingUserId = callerUserId,
+                    followedUserId = userId
+                )
+            } else {
+                false
+            }
+        )
     }
 
     suspend fun getUserByEmail(email: String): User? {
@@ -25,6 +48,18 @@ class UserService(
 
     fun isValidPassword(enteredPassword: String, actualPassword: String): Boolean {
         return enteredPassword == actualPassword
+    }
+
+    suspend fun updateUser(
+        userId: String,
+        profileImageUr: String,
+        updateProfileRequest: UpdateProfileRequest
+    ): Boolean {
+        return userRepository.updateUser(
+            userId = userId,
+            profileImageUrl = profileImageUr,
+            updateProfileRequest = updateProfileRequest
+        )
     }
 
     suspend fun searchForUsers(query: String, userId: String): List<UserResponseItem> {
@@ -51,7 +86,7 @@ class UserService(
                 bio = "",
                 githubUrl = null,
                 instagramUrl = null,
-                linkedinUrl = null
+                linkedinUrl = null,
             )
         )
     }

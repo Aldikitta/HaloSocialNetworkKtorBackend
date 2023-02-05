@@ -4,6 +4,7 @@ import com.aldikitta.di.mainModule
 import io.ktor.server.application.*
 import com.aldikitta.plugins.*
 import org.koin.ktor.plugin.Koin
+import java.nio.file.Paths
 
 fun main(args: Array<String>): Unit =
     io.ktor.server.netty.EngineMain.main(args)
