@@ -16,6 +16,7 @@ import com.aldikitta.util.Constants
 import com.aldikitta.util.Constants.BASE_URL
 import com.aldikitta.util.Constants.PROFILE_PICTURE_PATH
 import com.aldikitta.util.QueryParams
+import com.aldikitta.util.save
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.google.gson.Gson
@@ -200,10 +201,7 @@ fun Route.updateUserProfile(
                         }
 
                         is PartData.FileItem -> {
-                            val fileBytes = partData.streamProvider().readBytes()
-                            val fileExtension = partData.originalFileName?.takeLastWhile { it != '.' }
-                            fileName = UUID.randomUUID().toString() + "." + fileExtension
-                            File("$PROFILE_PICTURE_PATH$fileName").writeBytes(fileBytes)
+                            fileName = partData.save(PROFILE_PICTURE_PATH)
                         }
 
                         is PartData.BinaryItem -> Unit
