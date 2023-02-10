@@ -1,8 +1,8 @@
 package com.aldikitta.data.repository.likes
 
 import com.aldikitta.data.models.Like
+import com.aldikitta.data.models.Post
 import com.aldikitta.data.models.User
-import com.aldikitta.data.util.ParentType
 import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
@@ -19,7 +19,8 @@ class LikeRepositoryImpl(
                 Like(
                     userId = userId,
                     parentId = parentId,
-                    parentType = parentType
+                    parentType = parentType,
+                    timeStamp = System.currentTimeMillis()
                 )
             )
             true
@@ -45,5 +46,14 @@ class LikeRepositoryImpl(
 
     override suspend fun deleteLikesForParent(parentId: String) {
         like.deleteMany(Like::parentId eq parentId)
+    }
+
+    override suspend fun getLikesForParent(parentId: String, page: Int, pageSize: Int): List<Like> {
+        return like
+            .find(Like::parentId eq parentId)
+            .skip(page * pageSize)
+            .limit(pageSize)
+            .descendingSort(Like::timeStamp)
+            .toList()
     }
 }

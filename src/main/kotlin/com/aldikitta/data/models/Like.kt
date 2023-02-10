@@ -8,5 +8,6 @@ data class Like(
     val id: String = ObjectId().toString(),
     val userId: String,
     val parentId: String,
-    val parentType: Int
+    val parentType: Int,
+    val timeStamp: Long
 )

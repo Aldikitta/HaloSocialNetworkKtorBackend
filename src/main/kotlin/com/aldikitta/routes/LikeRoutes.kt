@@ -6,6 +6,7 @@ import com.aldikitta.data.util.ParentType
 import com.aldikitta.service.ActivityService
 import com.aldikitta.service.LikeService
 import com.aldikitta.util.ApiResponseMessages.USER_NOT_FOUND
+import com.aldikitta.util.QueryParams
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -88,6 +89,29 @@ fun Route.unLikeParent(
                     )
                 }
             }
+        }
+    }
+}
+
+fun Route.getLikeForParent(
+    likeService: LikeService
+) {
+    authenticate {
+        get("/api/like/parent") {
+            val parentId = call.parameters[QueryParams.PARAM_PARENT_ID] ?: kotlin.run {
+                call.respond(
+                    HttpStatusCode.BadRequest
+                )
+                return@get
+            }
+            val usersWhoLikedParent = likeService.getUsersWhoLikedParent(
+                parentId = parentId,
+                userId = call.userId
+            )
+            call.respond(
+                HttpStatusCode.OK,
+                usersWhoLikedParent
+            )
         }
     }
 }

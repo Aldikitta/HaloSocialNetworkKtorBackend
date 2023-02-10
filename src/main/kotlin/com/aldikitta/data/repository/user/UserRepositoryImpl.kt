@@ -4,6 +4,7 @@ import com.aldikitta.data.models.User
 import com.aldikitta.data.requests.UpdateProfileRequest
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
+import org.litote.kmongo.`in`
 import org.litote.kmongo.or
 import org.litote.kmongo.regex
 
@@ -67,5 +68,9 @@ class UserRepositoryImpl(
                 id = user.id
             )
         ).wasAcknowledged()
+    }
+
+    override suspend fun getUsers(userIds: List<String>): List<User> {
+        return users.find(User::id `in` userIds).toList()
     }
 }

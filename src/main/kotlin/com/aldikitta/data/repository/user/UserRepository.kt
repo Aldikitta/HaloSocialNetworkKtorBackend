@@ -16,4 +16,6 @@ interface UserRepository {
         updateProfileRequest: UpdateProfileRequest
     ): Boolean
 
+    suspend fun getUsers(userIds: List<String>): List<User>
+
 }

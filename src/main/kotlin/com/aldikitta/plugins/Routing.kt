@@ -77,6 +77,9 @@ fun Application.configureRouting() {
         unLikeParent(
             likeService = likeService
         )
+        getLikeForParent(
+            likeService = likeService
+        )
 
         // Comment routes
         createComment(
