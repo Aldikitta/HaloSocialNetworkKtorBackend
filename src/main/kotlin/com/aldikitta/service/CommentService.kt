@@ -2,11 +2,13 @@ package com.aldikitta.service
 
 import com.aldikitta.data.models.Comment
 import com.aldikitta.data.repository.comment.CommentRepository
+import com.aldikitta.data.repository.user.UserRepository
 import com.aldikitta.data.requests.CreateCommentRequest
 import com.aldikitta.util.Constants
 
 class CommentService(
-    private val commentRepository: CommentRepository
+    private val commentRepository: CommentRepository,
+    private val userRepository: UserRepository
 ) {
     suspend fun createComment(createCommentRequest: CreateCommentRequest, userId: String): ValidationEvents {
         createCommentRequest.apply {
@@ -17,8 +19,12 @@ class CommentService(
                 return ValidationEvents.ErrorCommentToLong
             }
         }
+        val user = userRepository.getUserById(userId) ?: return ValidationEvents.UserNotFound
         commentRepository.createComment(
             Comment(
+                username = user.username,
+                profileImageUrl = user.profileImageUrl,
+                likeCount = 0,
                 comment = createCommentRequest.comment,
                 userId = userId,
                 postId = createCommentRequest.postId,
@@ -32,7 +38,7 @@ class CommentService(
         return commentRepository.deleteComment(commentId = commentId)
     }
 
-    suspend fun getCommentsForPost(postId: String): List<Comment> {
+    suspend fun getCommentsForPost(postId: String, ownUserId: String): List<Comment> {
         return commentRepository.getCommentsForPost(postId = postId)
     }
 
@@ -47,6 +53,7 @@ class CommentService(
     sealed class ValidationEvents {
         object ErrorFieldEmpty : ValidationEvents()
         object ErrorCommentToLong : ValidationEvents()
+        object UserNotFound : ValidationEvents()
         object Success : ValidationEvents()
     }
 }

@@ -1,13 +1,11 @@
 package com.aldikitta.routes
 
 import com.aldikitta.data.requests.CreatePostRequest
-import com.aldikitta.data.requests.DeletePostRequest
 import com.aldikitta.data.responses.BasicApiResponse
 import com.aldikitta.service.CommentService
 import com.aldikitta.service.LikeService
 import com.aldikitta.service.PostService
 import com.aldikitta.service.UserService
-import com.aldikitta.util.ApiResponseMessages.USER_NOT_FOUND
 import com.aldikitta.util.Constants
 import com.aldikitta.util.Constants.POST_PICTURE_PATH
 import com.aldikitta.util.QueryParams
@@ -62,7 +60,7 @@ fun Route.createPost(
                     )
                     if (createPostAcknowledged) {
                         call.respond(
-                            HttpStatusCode.OK, BasicApiResponse(
+                            HttpStatusCode.OK, BasicApiResponse<Unit>(
                                 successful = true
                             )
                         )

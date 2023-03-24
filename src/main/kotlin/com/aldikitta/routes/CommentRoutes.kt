@@ -31,7 +31,7 @@ fun Route.createComment(
                 when (commentService.createComment(request, userId)) {
                     is CommentService.ValidationEvents.ErrorCommentToLong -> {
                         call.respond(
-                            HttpStatusCode.OK, BasicApiResponse(
+                            HttpStatusCode.OK, BasicApiResponse<Unit>(
                                 successful = false,
                                 message = ApiResponseMessages.COMMENT_TO_LONG
                             )
@@ -40,7 +40,7 @@ fun Route.createComment(
 
                     is CommentService.ValidationEvents.ErrorFieldEmpty -> {
                         call.respond(
-                            HttpStatusCode.OK, BasicApiResponse(
+                            HttpStatusCode.OK, BasicApiResponse<Unit>(
                                 successful = false,
                                 message = ApiResponseMessages.FIELD_BLANK
                             )
@@ -53,8 +53,17 @@ fun Route.createComment(
                             postId = request.postId,
                         )
                         call.respond(
-                            HttpStatusCode.OK, BasicApiResponse(
+                            HttpStatusCode.OK, BasicApiResponse<Unit>(
                                 successful = true,
+                            )
+                        )
+                    }
+                    is CommentService.ValidationEvents.UserNotFound -> {
+                        call.respond(
+                            HttpStatusCode.OK,
+                            BasicApiResponse<Unit>(
+                                successful = false,
+                                message = "User not found"
                             )
                         )
                     }
@@ -109,14 +118,14 @@ fun Route.deleteComment(
                     likeService.deleteLikesForParent(request.commentId)
                     call.respond(
                         HttpStatusCode.OK,
-                        BasicApiResponse(
+                        BasicApiResponse<Unit>(
                             successful = true
                         )
                     )
                 }else{
                     call.respond(
                         HttpStatusCode.NotFound,
-                        BasicApiResponse(
+                        BasicApiResponse<Unit>(
                             successful = false,
                             message = USER_NOT_FOUND
                         )

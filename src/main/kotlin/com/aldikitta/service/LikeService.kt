@@ -4,7 +4,6 @@ import com.aldikitta.data.repository.follow.FollowRepository
 import com.aldikitta.data.repository.likes.LikeRepository
 import com.aldikitta.data.repository.user.UserRepository
 import com.aldikitta.data.responses.UserResponseItem
-import com.aldikitta.data.util.ParentType
 
 class LikeService(
     private val likeRepository: LikeRepository,
@@ -16,7 +15,7 @@ class LikeService(
     }
 
     suspend fun unLikeParent(userId: String, parentId: String): Boolean {
-        return likeRepository.unLikeParent(userId = userId, parentId = parentId)
+        return likeRepository.unlikeParent(userId = userId, parentId = parentId)
     }
 
     suspend fun deleteLikesForParent(parentId: String){
