@@ -24,7 +24,6 @@ import java.util.*
 
 fun Route.createPost(
     postService: PostService,
-    userService: UserService
 ) {
     val gson by inject<Gson>()
     authenticate {
@@ -87,9 +86,9 @@ fun Route.getPostsForFollows(
             get {
                 val page = call.parameters[QueryParams.PARAM_PAGE]?.toIntOrNull() ?: 0
                 val pageSize =
-                    call.parameters[QueryParams.PARAM_PAGE_SIZE]?.toIntOrNull() ?: Constants.DEFAULT_POST_PAGE_SIZE
+                    call.parameters[QueryParams.PARAM_PAGE_SIZE]?.toIntOrNull() ?: Constants.DEFAULT_PAGE_SIZE
 
-                val posts = postService.getPostsForFollows(userId = call.userId, page = page, pageSize = pageSize)
+                val posts = postService.getPostsForFollows(ownUserId = call.userId, page = page, pageSize = pageSize)
                 call.respond(
                     HttpStatusCode.OK,
                     posts
@@ -107,30 +106,70 @@ fun Route.deletePost(
     authenticate {
         route("/api/post/delete") {
             delete {
-                val request = call.receiveNullable<DeletePostRequest>() ?: kotlin.run {
+                val postId = call.parameters["postId"] ?: kotlin.run {
                     call.respond(HttpStatusCode.BadRequest)
                     return@delete
                 }
-
-                val post = postService.getPost(request.postId)
+                val post = postService.getPost(postId)
                 if (post == null) {
-                    call.respond(
-                        HttpStatusCode.NotFound
-                    )
+                    call.respond(HttpStatusCode.NotFound)
                     return@delete
                 }
                 if (post.userId == call.userId) {
-                    postService.deletePost(request.postId)
-                    likeService.deleteLikesForParent(request.postId)
-                    commentService.deleteCommentsForPost(request.postId)
+                    postService.deletePost(postId)
+                    likeService.deleteLikesForParent(postId)
+                    commentService.deleteCommentsForPost(postId)
                     call.respond(HttpStatusCode.OK)
                 } else {
-                    call.respond(
-                        HttpStatusCode.Unauthorized
-                    )
+                    call.respond(HttpStatusCode.Unauthorized)
                 }
-
             }
         }
+    }
+}
+
+fun Route.getPostsForProfile(
+    postService: PostService,
+) {
+    authenticate {
+        route("/api/user/posts"){
+            get {
+                val userId = call.parameters[QueryParams.PARAM_USER_ID]
+                val page = call.parameters[QueryParams.PARAM_PAGE]?.toIntOrNull() ?: 0
+                val pageSize =
+                    call.parameters[QueryParams.PARAM_PAGE_SIZE]?.toIntOrNull() ?: Constants.DEFAULT_PAGE_SIZE
+
+                val posts = postService.getPostsForProfile(
+                    ownUserId = call.userId,
+                    userId = userId ?: call.userId,
+                    page = page,
+                    pageSize = pageSize
+                )
+                call.respond(
+                    HttpStatusCode.OK,
+                    posts
+                )
+            }
+        }
+    }
+}
+
+fun Route.getPostDetails(postService: PostService) {
+    get("/api/post/details") {
+        val postId = call.parameters["postId"] ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@get
+        }
+        val post = postService.getPostDetails(call.userId, postId) ?: kotlin.run {
+            call.respond(HttpStatusCode.NotFound)
+            return@get
+        }
+        call.respond(
+            HttpStatusCode.OK,
+            BasicApiResponse(
+                successful = true,
+                data = post
+            )
+        )
     }
 }

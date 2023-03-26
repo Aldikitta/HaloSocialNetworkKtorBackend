@@ -4,6 +4,7 @@ import com.aldikitta.data.models.Activity
 import com.aldikitta.data.repository.activity.ActivityRepository
 import com.aldikitta.data.repository.comment.CommentRepository
 import com.aldikitta.data.repository.post.PostRepository
+import com.aldikitta.data.responses.ActivityResponse
 import com.aldikitta.data.util.ActivityType
 import com.aldikitta.data.util.ParentType
 import com.aldikitta.util.Constants
@@ -16,8 +17,8 @@ class ActivityService(
     suspend fun getActivitiesForUser(
         userId: String,
         page: Int = 0,
-        pageSize: Int = Constants.DEFAULT_POST_PAGE_SIZE
-    ): List<Activity> {
+        pageSize: Int = Constants.DEFAULT_ACTIVITY_PAGE_SIZE
+    ): List<ActivityResponse> {
         return activityRepository.getActivitiesForUser(userId, page, pageSize)
     }
 
@@ -50,11 +51,9 @@ class ActivityService(
             is ParentType.Post -> {
                 postRepository.getPost(parentId)?.userId
             }
-
             is ParentType.Comment -> {
                 commentRepository.getComment(parentId)?.userId
             }
-
             is ParentType.None -> return false
         } ?: return false
         if (byUserId == toUserId){

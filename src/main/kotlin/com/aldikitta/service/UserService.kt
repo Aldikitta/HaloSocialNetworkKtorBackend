@@ -8,6 +8,8 @@ import com.aldikitta.data.requests.LoginRequest
 import com.aldikitta.data.requests.UpdateProfileRequest
 import com.aldikitta.data.responses.ProfileResponse
 import com.aldikitta.data.responses.UserResponseItem
+import com.aldikitta.util.Constants.DEFAULT_BANNER_IMAGE_PATH
+import com.aldikitta.util.Constants.DEFAULT_PROFILE_PICTURE_PATH
 
 class UserService(
     private val userRepository: UserRepository,
@@ -20,22 +22,21 @@ class UserService(
     suspend fun getUserProfile(userId: String, callerUserId: String): ProfileResponse? {
         val user = userRepository.getUserById(userId) ?: return null
         return ProfileResponse(
+            userId = user.id,
             username = user.username,
             bio = user.bio,
             followerCount = user.followerCount,
             followingCount = user.followingCount,
             profilePictureUrl = user.profileImageUrl,
             postCount = user.postCount,
-            topSkillUrls = user.skills,
+            topSkills = user.skills,
             githubUrl = user.githubUrl,
             instagramUrl = user.instagramUrl,
             linkedInUrl = user.linkedinUrl,
             isOwnProfile = userId == callerUserId,
+            bannerUrl = user.bannerUrl,
             isFollowing = if (userId != callerUserId) {
-                followRepository.doesUserFollow(
-                    followingUserId = callerUserId,
-                    followedUserId = userId
-                )
+                followRepository.doesUserFollow(callerUserId, userId)
             } else {
                 false
             }
@@ -52,13 +53,15 @@ class UserService(
 
     suspend fun updateUser(
         userId: String,
-        profileImageUr: String,
+        profileImageUrl: String?,
+        bannerUrl: String?,
         updateProfileRequest: UpdateProfileRequest
     ): Boolean {
         return userRepository.updateUser(
             userId = userId,
-            profileImageUrl = profileImageUr,
-            updateProfileRequest = updateProfileRequest
+            profileImageUrl = profileImageUrl,
+            updateProfileRequest = updateProfileRequest,
+            bannerUrl = bannerUrl
         )
     }
 
@@ -68,6 +71,7 @@ class UserService(
         return users.map { user ->
             val isFollowing = followsByUser.find { it.followedUserId == user.id } != null
             UserResponseItem(
+                userId = user.id,
                 username = user.username,
                 profilePictureUrl = user.profileImageUrl,
                 bio = user.bio,
@@ -82,7 +86,8 @@ class UserService(
                 email = request.email,
                 username = request.username,
                 password = request.password,
-                profileImageUrl = "",
+                profileImageUrl = DEFAULT_PROFILE_PICTURE_PATH,
+                bannerUrl = DEFAULT_BANNER_IMAGE_PATH,
                 bio = "",
                 githubUrl = null,
                 instagramUrl = null,

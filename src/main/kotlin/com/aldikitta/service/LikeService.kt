@@ -14,15 +14,15 @@ class LikeService(
         return likeRepository.likeParent(userId = userId, parentId = parentId, parentType = parentType)
     }
 
-    suspend fun unLikeParent(userId: String, parentId: String): Boolean {
-        return likeRepository.unlikeParent(userId = userId, parentId = parentId)
+    suspend fun unLikeParent(userId: String, parentId: String, parentType: Int): Boolean {
+        return likeRepository.unlikeParent(userId = userId, parentId = parentId, parentType = parentType)
     }
 
-    suspend fun deleteLikesForParent(parentId: String){
+    suspend fun deleteLikesForParent(parentId: String) {
         likeRepository.deleteLikesForParent(parentId = parentId)
     }
 
-    suspend fun getUsersWhoLikedParent(parentId: String, userId: String): List<UserResponseItem>{
+    suspend fun getUsersWhoLikedParent(parentId: String, userId: String): List<UserResponseItem> {
         val userIds = likeRepository.getLikesForParent(parentId).map {
             it.userId
         }
@@ -31,6 +31,7 @@ class LikeService(
         return users.map { user ->
             val isFollowing = followsByUser.find { it.followedUserId == user.id } != null
             UserResponseItem(
+                userId = user.id,
                 username = user.username,
                 profilePictureUrl = user.profileImageUrl,
                 bio = user.bio,

@@ -1,27 +1,17 @@
 package com.aldikitta.routes
 
 import com.aldikitta.data.models.User
-import com.aldikitta.data.requests.CreateAccountRequest
-import com.aldikitta.data.requests.LoginRequest
 import com.aldikitta.data.requests.UpdateProfileRequest
-import com.aldikitta.data.responses.AuthResponse
 import com.aldikitta.data.responses.BasicApiResponse
-import com.aldikitta.service.PostService
 import com.aldikitta.service.UserService
-import com.aldikitta.util.ApiResponseMessages.FIELD_BLANK
-import com.aldikitta.util.ApiResponseMessages.INVALID_CREDENTIALS
-import com.aldikitta.util.ApiResponseMessages.USER_ALREADY_EXIST
 import com.aldikitta.util.ApiResponseMessages.USER_NOT_FOUND
-import com.aldikitta.util.Constants
+import com.aldikitta.util.Constants.BANNER_IMAGE_PATH
 import com.aldikitta.util.Constants.BASE_URL
 import com.aldikitta.util.Constants.PROFILE_PICTURE_PATH
 import com.aldikitta.util.QueryParams
 import com.aldikitta.util.save
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import com.google.gson.Gson
 import io.ktor.http.*
-import io.ktor.http.ContentDisposition.Companion.File
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -30,8 +20,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 import java.io.File
-import java.nio.file.Paths
-import java.util.*
 
 fun Route.searchUser(
     userService: UserService
@@ -57,30 +45,6 @@ fun Route.searchUser(
     }
 }
 
-fun Route.getPostsForProfile(
-    postService: PostService
-) {
-    authenticate {
-        route("/api/user/posts") {
-            get {
-                val page = call.parameters[QueryParams.PARAM_PAGE]?.toIntOrNull() ?: 0
-                val pageSize =
-                    call.parameters[QueryParams.PARAM_PAGE_SIZE]?.toIntOrNull() ?: Constants.DEFAULT_POST_PAGE_SIZE
-
-                val posts = postService.getPostsForProfile(
-                    userId = call.userId,
-                    page = page,
-                    pageSize = pageSize
-                )
-                call.respond(
-                    HttpStatusCode.OK,
-                    posts
-                )
-            }
-        }
-    }
-}
-
 fun Route.updateUserProfile(
     userService: UserService
 ) {
@@ -90,31 +54,47 @@ fun Route.updateUserProfile(
             put {
                 val multipart = call.receiveMultipart()
                 var updateProfileRequest: UpdateProfileRequest? = null
-                var fileName: String? = null
+                var profilePictureFileName: String? = null
+                var bannerImageFileName: String? = null
                 multipart.forEachPart { partData ->
                     when (partData) {
                         is PartData.FormItem -> {
                             if (partData.name == "update_profile_data") {
-                                updateProfileRequest =
-                                    gson.fromJson(partData.value, UpdateProfileRequest::class.java)
-
+                                updateProfileRequest = gson.fromJson(
+                                    partData.value,
+                                    UpdateProfileRequest::class.java
+                                )
                             }
                         }
 
                         is PartData.FileItem -> {
-                            fileName = partData.save(PROFILE_PICTURE_PATH)
+                            if (partData.name == "profile_picture") {
+                                profilePictureFileName = partData.save(PROFILE_PICTURE_PATH)
+                            } else if (partData.name == "banner_image") {
+                                bannerImageFileName = partData.save(BANNER_IMAGE_PATH)
+                            }
                         }
 
                         is PartData.BinaryItem -> Unit
                         else -> {}
                     }
                 }
-                val profilePictureUrl = "${BASE_URL}profile_pictures/$fileName"
+                val profilePictureUrl = "${BASE_URL}profile_pictures/$profilePictureFileName"
+                val bannerImageUrl = "${BASE_URL}banner_images/$bannerImageFileName"
 
                 updateProfileRequest?.let { request ->
                     val updateAcknowledged = userService.updateUser(
                         userId = call.userId,
-                        profileImageUr = profilePictureUrl,
+                        profileImageUrl = if (profilePictureFileName == null) {
+                            null
+                        } else {
+                            profilePictureUrl
+                        },
+                        bannerUrl = if (bannerImageFileName == null) {
+                            null
+                        } else {
+                            bannerImageUrl
+                        },
                         updateProfileRequest = request
                     )
                     if (updateAcknowledged) {
@@ -124,7 +104,7 @@ fun Route.updateUserProfile(
                             )
                         )
                     } else {
-                        File("${PROFILE_PICTURE_PATH}/$fileName").delete()
+                        File("${PROFILE_PICTURE_PATH}/$profilePictureFileName").delete()
                         call.respond(
                             HttpStatusCode.InternalServerError
                         )
@@ -162,7 +142,10 @@ fun Route.getUserProfile(
                 }
                 call.respond(
                     HttpStatusCode.OK,
-                    profileResponse
+                    BasicApiResponse(
+                        successful = true,
+                        data = profileResponse
+                    )
                 )
             }
         }

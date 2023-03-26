@@ -4,6 +4,7 @@ import com.aldikitta.data.models.Comment
 import com.aldikitta.data.repository.comment.CommentRepository
 import com.aldikitta.data.repository.user.UserRepository
 import com.aldikitta.data.requests.CreateCommentRequest
+import com.aldikitta.data.responses.CommentResponse
 import com.aldikitta.util.Constants
 
 class CommentService(
@@ -38,8 +39,8 @@ class CommentService(
         return commentRepository.deleteComment(commentId = commentId)
     }
 
-    suspend fun getCommentsForPost(postId: String, ownUserId: String): List<Comment> {
-        return commentRepository.getCommentsForPost(postId = postId)
+    suspend fun getCommentsForPost(postId: String, ownUserId: String): List<CommentResponse> {
+        return commentRepository.getCommentsForPost(postId = postId, ownUserId = ownUserId)
     }
 
     suspend fun getCommentById(commentId: String): Comment? {

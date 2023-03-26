@@ -5,6 +5,7 @@ import com.aldikitta.data.responses.BasicApiResponse
 import com.aldikitta.data.util.ParentType
 import com.aldikitta.service.ActivityService
 import com.aldikitta.service.LikeService
+import com.aldikitta.util.ApiResponseMessages
 import com.aldikitta.util.ApiResponseMessages.USER_NOT_FOUND
 import com.aldikitta.util.QueryParams
 import io.ktor.http.*
@@ -64,19 +65,20 @@ fun Route.unLikeParent(
     authenticate {
         route("/api/unlike") {
             delete {
-                val request = call.receiveNullable<LikeUpdateRequest>() ?: kotlin.run {
+                val parentId = call.parameters[QueryParams.PARAM_PARENT_ID] ?: kotlin.run {
                     call.respond(HttpStatusCode.BadRequest)
                     return@delete
                 }
-                val unlikeSuccessful = likeService.unLikeParent(
-                    userId = call.userId,
-                    parentId = request.parentId
-                )
-                if (unlikeSuccessful) {
+                val parentType = call.parameters[QueryParams.PARAM_PARENT_TYPE]?.toIntOrNull() ?: kotlin.run {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@delete
+                }
+                val unlikeSuccessful = likeService.unLikeParent(call.userId, parentId, parentType)
+                if(unlikeSuccessful) {
                     call.respond(
                         HttpStatusCode.OK,
                         BasicApiResponse<Unit>(
-                            successful = true,
+                            successful = true
                         )
                     )
                 } else {
@@ -84,7 +86,7 @@ fun Route.unLikeParent(
                         HttpStatusCode.OK,
                         BasicApiResponse<Unit>(
                             successful = false,
-                            message = USER_NOT_FOUND
+                            message = ApiResponseMessages.USER_NOT_FOUND
                         )
                     )
                 }

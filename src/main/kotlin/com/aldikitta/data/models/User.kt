@@ -1,6 +1,7 @@
 package com.aldikitta.data.models
 
 import com.aldikitta.data.responses.ProfileResponse
+import com.aldikitta.data.responses.SkillDto
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
 
@@ -13,7 +14,7 @@ data class User(
     val profileImageUrl: String,
     val bannerUrl: String?,
     val bio: String,
-    val skills: List<String> = listOf(),
+    val skills: List<SkillDto> = listOf(),
     val githubUrl: String?,
     val instagramUrl: String?,
     val linkedinUrl: String?,

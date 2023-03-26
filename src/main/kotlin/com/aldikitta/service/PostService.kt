@@ -3,6 +3,7 @@ package com.aldikitta.service
 import com.aldikitta.data.models.Post
 import com.aldikitta.data.repository.post.PostRepository
 import com.aldikitta.data.requests.CreatePostRequest
+import com.aldikitta.data.responses.PostResponse
 import com.aldikitta.util.Constants
 
 class PostService(
@@ -20,23 +21,25 @@ class PostService(
     }
 
     suspend fun getPostsForFollows(
-        userId: String,
+        ownUserId: String,
         page: Int = 0,
-        pageSize: Int = Constants.DEFAULT_POST_PAGE_SIZE
-    ): List<Post> {
-        return postRepository.getPostByFollows(
-            userId = userId,
+        pageSize: Int = Constants.DEFAULT_PAGE_SIZE
+    ): List<PostResponse> {
+        return postRepository.getPostsByFollows(
+            ownUserId = ownUserId,
             page = page,
             pageSize = pageSize
         )
     }
 
     suspend fun getPostsForProfile(
+        ownUserId: String,
         userId: String,
         page: Int = 0,
-        pageSize: Int = Constants.DEFAULT_POST_PAGE_SIZE
-    ): List<Post> {
+        pageSize: Int = Constants.DEFAULT_PAGE_SIZE
+    ): List<PostResponse> {
         return postRepository.getPostsForProfile(
+            ownUserId = ownUserId,
             userId = userId,
             page = page,
             pageSize = pageSize
@@ -44,6 +47,10 @@ class PostService(
     }
 
     suspend fun getPost(postId: String): Post? = postRepository.getPost(postId)
+
+    suspend fun getPostDetails(ownUserId: String, postId: String): PostResponse? {
+        return postRepository.getPostDetails(ownUserId, postId)
+    }
 
     suspend fun deletePost(postId: String) {
         postRepository.deletePost(postId)

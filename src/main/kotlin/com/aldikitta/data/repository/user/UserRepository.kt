@@ -12,10 +12,10 @@ interface UserRepository {
     suspend fun searchForUsers(query: String): List<User>
     suspend fun updateUser(
         userId: String,
-        profileImageUrl: String,
+        profileImageUrl: String?,
+        bannerUrl: String?,
         updateProfileRequest: UpdateProfileRequest
     ): Boolean
 
     suspend fun getUsers(userIds: List<String>): List<User>
-
 }

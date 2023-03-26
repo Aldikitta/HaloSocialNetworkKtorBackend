@@ -7,6 +7,7 @@ import com.aldikitta.data.util.ActivityType
 import com.aldikitta.service.ActivityService
 import com.aldikitta.service.FollowService
 import com.aldikitta.util.ApiResponseMessages.USER_NOT_FOUND
+import com.aldikitta.util.QueryParams
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -62,11 +63,11 @@ fun Route.unfollowUser(followService: FollowService) {
     authenticate {
         route("/api/following/unfollow") {
             delete {
-                val request = call.receiveNullable<FollowUpdateRequest>() ?: kotlin.run {
+                val userId = call.parameters[QueryParams.PARAM_USER_ID] ?: kotlin.run {
                     call.respond(HttpStatusCode.BadRequest)
                     return@delete
                 }
-                val didUserExist = followService.unfollowUserIfExists(request, call.userId)
+                val didUserExist = followService.unfollowUserIfExists(userId, call.userId)
                 if (didUserExist) {
                     call.respond(
                         HttpStatusCode.OK,

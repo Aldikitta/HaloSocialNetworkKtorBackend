@@ -10,6 +10,8 @@ import com.aldikitta.data.repository.likes.LikeRepository
 import com.aldikitta.data.repository.likes.LikeRepositoryImpl
 import com.aldikitta.data.repository.post.PostRepository
 import com.aldikitta.data.repository.post.PostRepositoryImpl
+import com.aldikitta.data.repository.skill.SkillRepository
+import com.aldikitta.data.repository.skill.SkillRepositoryImpl
 import com.aldikitta.data.repository.user.UserRepository
 import com.aldikitta.data.repository.user.UserRepositoryImpl
 import com.aldikitta.service.*
@@ -43,12 +45,14 @@ val mainModule = module {
     single<ActivityRepository> {
         ActivityRepositoryImpl(get())
     }
+    single<SkillRepository> {
+        SkillRepositoryImpl(get())
+    }
     single { UserService(get(), get()) }
     single { FollowService(get()) }
     single { PostService(get()) }
+    single { SkillService(get()) }
     single { LikeService(get(), get(), get()) }
-    single { CommentService(get()) }
+    single { CommentService(get(), get()) }
     single { ActivityService(get(), get(), get()) }
-
-
 }
